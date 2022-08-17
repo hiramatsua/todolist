@@ -24,13 +24,13 @@ class TaskController extends Controller
             $tasks = Task::where('title', 'like', '%' . $search . '%')
                 ->where('category_id', $id)
                 ->orderBy('due_date')
-                ->paginate(10);
+                ->paginate(5);
         } else {
         // 選択されたカテゴリに紐つくタスクとその件数を取得する
             $tasks = Task::where('category_id', $id)
                 ->orderBy('due_date')
-                ->paginate(10);
-        }        
+                ->paginate(5);
+        }
         //dd($tasks);
         $tasks_cnt = Task::where('category_id', $id)->count();
         // 状況ごとのタスク件数を取得する
@@ -89,12 +89,12 @@ class TaskController extends Controller
             'task' => $task,
         ]);
     }
-    
+
     // post /categories/{id}/tasks/{task_id}/edit
     public function edit(Category $category, Task $task, EditTask $request) {
-        
+
         $this->checkRelation($category, $task);
-        
+
         $category_id = $request->category_id;
         // 編集対象のタスクデータに入力値を詰めてsave
         $task = Task::find($request->id);
@@ -104,13 +104,13 @@ class TaskController extends Controller
         $task->due_date = $request->due_date;
         $task->category_id = $category_id;
         $task->save();
-        
+
         // 編集対象のタスクが属するタスク一覧画面へリダイレクト
         return redirect()->route('tasks.index', [
             'id' => $category_id,
         ])->with('message_task', 'タスクを更新しました。');
     }
-    
+
     private function checkRelation(Category $category, Task $task) {
 
         if ($category->id !== $task->category_id) {
